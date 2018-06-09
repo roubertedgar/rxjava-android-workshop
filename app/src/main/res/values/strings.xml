@@ -1,3 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">rxjava-android-workshop</string>
+    <string name="app_name">RxWorkShop</string>
+    <string name="done_text">Done</string>
+    <string name="place_name_example">Example name</string>
+    <string name="place_description">Example description</string>
+    <string name="name_label">Name</string>
+    <string name="description_label">Description</string>
 </resources>
