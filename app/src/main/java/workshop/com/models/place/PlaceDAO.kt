@@ -8,7 +8,7 @@ interface PlaceDAO {
     fun getAll(): List<Place>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(place: Place)
+    fun insert(place: Place): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(vararg place: Place)
