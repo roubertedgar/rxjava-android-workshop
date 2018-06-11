@@ -41,13 +41,6 @@ class MainActivity : AppCompatActivity() {
         recyclerPlaceList.adapter = PlaceAdapter(placeList)
     }
 
-
-    private fun updatePlaceList(places: List<Place>) {
-        placeList.clear()
-        placeList.addAll(places)
-        recyclerPlaceList.adapter?.notifyDataSetChanged()
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
             val place = data?.getSerializableExtra("place") as Place
