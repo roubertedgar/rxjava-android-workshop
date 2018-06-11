@@ -13,7 +13,7 @@ import workshop.com.models.place.Place
 import workshop.com.models.place.PlaceDAO
 import workshop.com.views.place.PLaceFormActivity
 import workshop.com.views.place.PlaceAdapter
-import java.util.concurrent.Executors
+import workshop.com.views.place.SavePlaceTask
 
 
 class MainActivity : AppCompatActivity() {
@@ -46,23 +46,13 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
             var place = data?.getSerializableExtra("place") as Place
-            val executor = Executors.newFixedThreadPool(1)
-            var placeId: Long? = null
 
-            val savePlaceThread = Runnable {
-                placeId = placeDao.insert(place)
-            }
-            executor.execute(savePlaceThread)
+            SavePlaceTask(placeDao, {
+                Snackbar.make(mainContainer, "Place saved =D", Snackbar.LENGTH_LONG).show()
+                placeList.add(place)
+                recyclerPlaceList.adapter?.notifyDataSetChanged()
 
-            while (!executor.isTerminated) {
-                if (placeId != null) {
-                    executor.shutdown()
-                    Snackbar.make(mainContainer, "Place saved =D", Snackbar.LENGTH_LONG).show()
-                }
-            }
-
-            placeList.add(place)
-            recyclerPlaceList.adapter?.notifyDataSetChanged()
+            }).execute(place)
         }
     }
 }
