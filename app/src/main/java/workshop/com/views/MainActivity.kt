@@ -1,9 +1,7 @@
 package workshop.com.views
 
 import android.app.Activity
-import android.app.Fragment
 import android.content.Intent
-import android.os.AsyncTask
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,7 +14,6 @@ import workshop.com.models.place.PlaceDAO
 import workshop.com.views.place.PLaceFormActivity
 import workshop.com.views.place.PlaceAdapter
 import workshop.com.views.place.SavePlaceTask
-import java.util.concurrent.Executors
 
 
 class MainActivity : AppCompatActivity() {
