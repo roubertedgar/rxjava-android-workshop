@@ -51,13 +51,20 @@ class MainActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK) {
             val place = data?.getSerializableExtra("place") as Place
 
-            Completable.fromAction { placeDao.insert(place) }
-                    .observeOn(Schedulers.io())
-                    .subscribeOn(AndroidSchedulers.mainThread()).subscribe {
+            val saveDisposable = Completable.fromAction { placeDao.insert(place) }
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
                         Snackbar.make(mainContainer, "Place saved =D", Snackbar.LENGTH_LONG).show()
                         placeList.add(place)
                         recyclerPlaceList.adapter?.notifyDataSetChanged()
                     }
+            compositeDisposable.add(saveDisposable)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable.dispose()
     }
 }
