@@ -29,7 +29,7 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview-selection:1.0.0-alpha3'
 
     implementation "androidx.room:room-runtime:2.0.0-alpha1"
-    implementation "android.arch.persistence.room:rxjava2:1.1.0"
+    implementation "androidx.room:room-rxjava2:2.0.0-alpha1"
     kapt "androidx.room:room-compiler:2.0.0-alpha1"
 
     implementation 'io.reactivex.rxjava2:rxjava:2.1.14'
