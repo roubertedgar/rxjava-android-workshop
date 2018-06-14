@@ -6,6 +6,10 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import workshop.com.R
 import workshop.com.models.FactoryDAO
@@ -13,11 +17,11 @@ import workshop.com.models.place.Place
 import workshop.com.models.place.PlaceDAO
 import workshop.com.views.place.PLaceFormActivity
 import workshop.com.views.place.PlaceAdapter
-import workshop.com.views.place.SavePlaceTask
 
 
 class MainActivity : AppCompatActivity() {
 
+    private val compositeDisposable = CompositeDisposable()
     private lateinit var placeDao: PlaceDAO
 
     private val placeList: MutableList<Place> = mutableListOf()
@@ -45,14 +49,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
-            var place = data?.getSerializableExtra("place") as Place
+            val place = data?.getSerializableExtra("place") as Place
 
-            SavePlaceTask(placeDao, {
-                Snackbar.make(mainContainer, "Place saved =D", Snackbar.LENGTH_LONG).show()
-                placeList.add(place)
-                recyclerPlaceList.adapter?.notifyDataSetChanged()
-
-            }).execute(place)
+            Completable.fromAction { placeDao.insert(place) }
+                    .observeOn(Schedulers.io())
+                    .subscribeOn(AndroidSchedulers.mainThread()).subscribe {
+                        Snackbar.make(mainContainer, "Place saved =D", Snackbar.LENGTH_LONG).show()
+                        placeList.add(place)
+                        recyclerPlaceList.adapter?.notifyDataSetChanged()
+                    }
         }
     }
 }
