@@ -7,6 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.Completable
+import io.reactivex.Maybe
+import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -51,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK) {
             val place = data?.getSerializableExtra("place") as Place
 
-            val saveDisposable = Completable.fromAction { placeDao.insert(place) }
+            Completable.fromAction { placeDao.insert(place) }
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
@@ -59,7 +62,6 @@ class MainActivity : AppCompatActivity() {
                         placeList.add(place)
                         recyclerPlaceList.adapter?.notifyDataSetChanged()
                     }
-            compositeDisposable.add(saveDisposable)
         }
     }
 
