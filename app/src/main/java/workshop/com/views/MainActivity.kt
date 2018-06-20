@@ -7,9 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.Completable
-import io.reactivex.Maybe
-import io.reactivex.Observable
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -25,9 +22,8 @@ import workshop.com.views.place.PlaceAdapter
 class MainActivity : AppCompatActivity() {
 
     private val compositeDisposable = CompositeDisposable()
-    private lateinit var placeDao: PlaceDAO
-
     private val placeList: MutableList<Place> = mutableListOf()
+    private lateinit var placeDao: PlaceDAO
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +33,7 @@ class MainActivity : AppCompatActivity() {
 
         setListeners()
         initRecyclerView()
+        loadPlaces()
     }
 
     private fun setListeners() {
@@ -50,19 +47,35 @@ class MainActivity : AppCompatActivity() {
         recyclerPlaceList.adapter = PlaceAdapter(placeList)
     }
 
+    private fun loadPlaces() {
+        compositeDisposable.add(placeDao.getAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    placeList.clear()
+                    placeList.addAll(it)
+                    recyclerPlaceList.adapter?.notifyDataSetChanged()
+                })
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
             val place = data?.getSerializableExtra("place") as Place
-
-            Completable.fromAction { placeDao.insert(place) }
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        Snackbar.make(mainContainer, "Place saved =D", Snackbar.LENGTH_LONG).show()
-                        placeList.add(place)
-                        recyclerPlaceList.adapter?.notifyDataSetChanged()
-                    }
+            savePlace(place)
         }
+    }
+
+
+    private fun savePlace(place: Place) {
+        val saveDisposable = Completable.fromAction { placeDao.insert(place) }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    Snackbar.make(mainContainer, "Place saved =D", Snackbar.LENGTH_LONG).show()
+                    loadPlaces()
+                }
+
+        saveDisposable.dispose()
     }
 
     override fun onDestroy() {
@@ -70,3 +83,4 @@ class MainActivity : AppCompatActivity() {
         compositeDisposable.dispose()
     }
 }
+
