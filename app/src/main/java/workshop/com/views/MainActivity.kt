@@ -53,16 +53,19 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
             val place = data?.getSerializableExtra("place") as Place
-
-            Completable.fromAction { placeDao.insert(place) }
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        Snackbar.make(mainContainer, "Place saved =D", Snackbar.LENGTH_LONG).show()
-                        placeList.add(place)
-                        recyclerPlaceList.adapter?.notifyDataSetChanged()
-                    }
+            savePlace(place)
         }
+    }
+
+    private fun savePlace(place: Place) {
+        Completable.fromAction { placeDao.insert(place) }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    Snackbar.make(mainContainer, "Place saved =D", Snackbar.LENGTH_LONG).show()
+                    placeList.add(place)
+                    recyclerPlaceList.adapter?.notifyDataSetChanged()
+                }
     }
 
     override fun onDestroy() {
