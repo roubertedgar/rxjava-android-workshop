@@ -1,6 +1,5 @@
 package workshop.com.views.place
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.Flowable
 import org.junit.After
@@ -9,26 +8,22 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import util.RxSchedulerTestSetup
 import workshop.com.models.place.Place
 import workshop.com.models.place.PlaceDAO
-import org.junit.Rule
-import util.RxSchedulerTestSetup
 
 
 @RunWith(MockitoJUnitRunner::class)
 class PlaceViewModelTest {
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
-
     @Mock
-    lateinit var placeDAO: PlaceDAO
+    lateinit var dao: PlaceDAO
 
-    lateinit var placeViewModel: PlaceViewModel
+    private lateinit var viewModel: PlaceViewModel
 
     @Before
     fun setUp() {
         RxSchedulerTestSetup.setupRxScheduler()
-        placeViewModel = PlaceViewModel(placeDAO)
+        viewModel = PlaceViewModel(dao)
     }
 
     @After
@@ -37,15 +32,32 @@ class PlaceViewModelTest {
     }
 
     @Test
-    fun listAllPlacesWhenGetAll() {
-        whenever(placeDAO.getAll()).thenReturn(Flowable.just(getFakePlaces()))
-
-        placeViewModel.getAll().test().assertValue {
-            it.size == 2
-        }
+    fun completeWhenSavePlace() {
+        viewModel.insert(Place("", ""))
+                .test()
+                .assertNoValues()
+                .assertComplete()
     }
 
-    private fun getFakePlaces(): List<Place> {
-        return listOf(Place("", ""), Place("", ""))
+    @Test
+    fun returnsAllSavedPlacesWhenGetAll() {
+        whenever(dao.getAll()).thenReturn(Flowable.just(getPlaces()))
+
+        viewModel.getAll().test()
+                .assertValue {
+                    it.size == 2
+                }.assertComplete()
     }
+
+    @Test
+    fun emptyWhenAreNoItemsSaved() {
+        whenever(dao.getAll()).thenReturn(Flowable.empty())
+
+        viewModel.getAll().test()
+                .assertNoValues()
+                .assertComplete()
+    }
+
+    private fun getPlaces(): List<Place> =
+            listOf(Place("", ""), Place("", ""))
 }
