@@ -13,7 +13,6 @@ class PLaceFormActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_place_form)
-        FactoryDAO.getPlaceDatabase(applicationContext)
 
         doneButton.setOnClickListener {
             val name = placeName.text.toString()
