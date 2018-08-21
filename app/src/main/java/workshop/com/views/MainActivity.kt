@@ -15,7 +15,6 @@ import workshop.com.models.place.Place
 import workshop.com.views.place.PLaceFormActivity
 import workshop.com.views.place.PlaceAdapter
 import workshop.com.views.place.PlaceViewModel
-import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -52,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setListeners() {
         addButton.setOnClickListener {
-            startActivityForResult(Intent(this, PLaceFormActivity::class.java), 200)
+            startActivity(Intent(this, PLaceFormActivity::class.java))
         }
 
         searchEditText.onTextChange { loadPlaces(it) }
