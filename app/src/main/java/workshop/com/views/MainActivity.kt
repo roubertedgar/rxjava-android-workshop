@@ -32,7 +32,6 @@ class MainActivity : AppCompatActivity() {
 
         setListeners()
         initRecyclerView()
-        loadPlaces("")
     }
 
     private fun TextView.onTextChange(textWatcher: (String) -> Unit) {
@@ -54,29 +53,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, PLaceFormActivity::class.java))
         }
 
-        searchEditText.onTextChange { loadPlaces(it) }
+        searchEditText.onTextChange { (recyclerPlaceList.adapter as PlaceAdapter).filter(it) }
     }
 
     private fun initRecyclerView() {
         recyclerPlaceList.layoutManager = LinearLayoutManager(this)
-        recyclerPlaceList.adapter = PlaceAdapter(placeList)
-    }
-
-    private fun loadPlaces(query: String) {
-        placeViewModel.getAll()
-                .doOnRequest { placeList.clear() }
-                .flatMapIterable { it }
-                .filter { placeFilter(it, query) }
-                .subscribe {
-                    placeList.add(it)
-                    recyclerPlaceList.adapter?.notifyDataSetChanged()
-                }
-    }
-
-    private fun placeFilter(place: Place, query: String): Boolean {
-        return query.isBlank()
-                || place.name.toUpperCase().contains(query.toUpperCase())
-                || place.description.toUpperCase().contains(query.toUpperCase())
+        recyclerPlaceList.adapter = PlaceAdapter(placeViewModel.getAll())
     }
 
     override fun onDestroy() {
