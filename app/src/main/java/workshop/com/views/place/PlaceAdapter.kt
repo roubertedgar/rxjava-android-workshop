@@ -17,13 +17,13 @@ class PlaceAdapter(observable: Flowable<List<Place>>) : RecyclerView.Adapter<Pla
     private var disposable: Disposable? = null
 
     private var items = mutableListOf<Place>()
-    private var toFilter = listOf<Place>()
+    private var backupItemsList = listOf<Place>()
 
     init {
         observable
                 .subscribe {
                     items = it.toMutableList()
-                    toFilter = it.toList()
+                    backupItemsList = it.toList()
                     notifyDataSetChanged()
                 }
     }
@@ -55,7 +55,7 @@ class PlaceAdapter(observable: Flowable<List<Place>>) : RecyclerView.Adapter<Pla
 
         if (disposable == null || disposable?.isDisposed!!) {
             disposable = asyncFilter(query)
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { notifyDataSetChanged() }
         }
@@ -64,7 +64,7 @@ class PlaceAdapter(observable: Flowable<List<Place>>) : RecyclerView.Adapter<Pla
     private fun asyncFilter(query: String): Completable {
         return Completable.fromAction {
             items.clear()
-            toFilter.filterTo(items) { place -> placeFilter(place, query) }
+            backupItemsList.filterTo(items) { place -> placeFilter(place, query) }
         }
     }
 
