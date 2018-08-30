@@ -9,6 +9,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import workshop.com.R
 import workshop.com.models.FactoryDAO
 import workshop.com.models.place.Place
+import workshop.com.util.onTextChange
 import workshop.com.views.place.PLaceFormActivity
 import workshop.com.views.place.PlaceAdapter
 import workshop.com.views.place.PlaceViewModel
@@ -36,6 +37,8 @@ class MainActivity : AppCompatActivity() {
         addButton.setOnClickListener {
             startActivity(Intent(this, PLaceFormActivity::class.java))
         }
+
+        searchEditText.onTextChange {}
     }
 
     private fun initRecyclerView() {
