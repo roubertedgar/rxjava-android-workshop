@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setListeners() {
         addButton.setOnClickListener {
-            startActivityForResult(Intent(this, PLaceFormActivity::class.java), 200)
+            startActivity(Intent(this, PLaceFormActivity::class.java))
         }
     }
 
