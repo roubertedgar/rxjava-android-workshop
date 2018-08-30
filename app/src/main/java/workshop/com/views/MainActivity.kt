@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import workshop.com.R
@@ -20,8 +19,6 @@ import workshop.com.views.place.PlaceAdapter
 
 
 class MainActivity : AppCompatActivity() {
-
-    private val compositeDisposable = CompositeDisposable()
     private val placeList: MutableList<Place> = mutableListOf()
     private lateinit var placeDao: PlaceDAO
 
@@ -48,14 +45,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadPlaces() {
-        compositeDisposable.add(placeDao.getAll()
+        placeDao.getAll()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     placeList.clear()
                     placeList.addAll(it)
                     recyclerPlaceList.adapter?.notifyDataSetChanged()
-                })
+                }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -67,20 +64,13 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun savePlace(place: Place) {
-        val saveDisposable = Completable.fromAction { placeDao.insert(place) }
+        Completable.fromAction { placeDao.insert(place) }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     Snackbar.make(mainContainer, "Place saved =D", Snackbar.LENGTH_LONG).show()
                     loadPlaces()
                 }
-
-        saveDisposable.dispose()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        compositeDisposable.dispose()
     }
 }
 
